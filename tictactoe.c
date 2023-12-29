@@ -4,8 +4,6 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-#define INPUT_BUFFER_SIZE 64
-
 void render_grid(const char grid[9])
 {
 	printf("\n     0   1   2\n");
@@ -28,7 +26,7 @@ bool same_row(const char grid[9], int row)
 	
 	return a == b && b == c;
 }
-		
+
 bool same_column(const char grid[9], int col)
 {
 	char a = grid[col];
@@ -60,24 +58,32 @@ bool check_for_win(const char grid[9], int x, int y)
 }
 
 // Returns true if input is valid
-bool get_int_input(int* dest, char* prompt)
+bool get_int_input(int* dest, const char* prompt)
 {
-	char input_buffer[INPUT_BUFFER_SIZE];
-	memset(input_buffer, '\0', INPUT_BUFFER_SIZE);
-	
 	printf("%s", prompt);
-	fgets(input_buffer, INPUT_BUFFER_SIZE, stdin);
+	char input_c = getchar();
+
+	// Flush input buffer while counting extra characters
+	unsigned extra = 0;
+	for (int c; (c = getchar()) != '\n' && c != EOF; extra++);
 
 	// Check if input is valid
-	if (strlen(input_buffer) != 2 || !isdigit(input_buffer[0]))
+	if (extra > 0)
 	{
-		printf("\n+----------------+\n");
-		printf("| Invalid input! |\n");
-		printf("+----------------+\n");
+		printf("\n+-------------------------------------------+\n");
+		printf("| Invalid input: Entered input is too long! |\n");
+		printf("+-------------------------------------------+\n");
+		return false;
+	}
+	if (!isdigit(input_c))
+	{
+		printf("\n+----------------------------------------+\n");
+		printf("| Invalid input: Input must be a number! |\n");
+		printf("+----------------------------------------+\n");
 		return false;
 	}
 	
-	*dest = atoi(input_buffer);
+	*dest = atoi(&input_c);
 	return true;
 }
 
